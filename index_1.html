@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>いま・ここ・私の状態 — Japan EQ 簡易診断</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
+
+:root{
+  color-scheme: light;
+  /* ── Blue-Green Nature Palette ── */
+  --bg:#F2F8F5;
+  --bg2:#EAF4EF;
+  --card:#FFFFFF;
+  --ink:#253830;
+  --ink-soft:#4D6B5E;
+  --ink-faint:#8AADA0;
+  --line:#C8E2D8;
+  --accent:#2E9E7A;
+  --accent-mid:#4BB896;
+  --accent-soft:#A8D9C8;
+  --accent-bg:#EBF7F2;
+  --accent-deep:#1B7A5C;
+  --leaf1:#6DBF94;
+  --leaf2:#3DA87A;
+  --breeze:#B8E4D4;
+  --tension:#7ABFB8;
+  --active:#5BB09A;
+  --calm:#94CEBC;
+  --still:#A0C4BA;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+/* 背景：若葉の朝露をイメージした微細テクスチャ */
+html,body{background:var(--bg);}
+
+button,a,.choice,.opt,.num{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+body.busy button,body.busy a,body.busy .choice,body.busy .opt,body.busy .num{pointer-events:none;}
+body{
+  font-family:'Zen Kaku Gothic New',"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  color:var(--ink);
+  line-height:1.9;
+  display:flex;
+  justify-content:center;
+  padding:0;
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(110,210,170,.13) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(60,180,130,.10) 0%, transparent 55%),
+    var(--bg);
+}
+#app{
+  width:100%;
+  max-width:460px;
+  min-height:100vh;
+  min-height:100dvh;
+  background:transparent;
+  position:relative;
+  padding:0 22px;
+  padding-bottom:max(60px, env(safe-area-inset-bottom));
+}
+.screen{display:none;animation:fade .55s cubic-bezier(.22,.68,0,1.2);}
+.screen.on{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* ── Decorative leaf motifs ── */
+.leaf-deco{
+  position:absolute;right:-10px;top:20px;
+  width:80px;height:80px;
+  opacity:.13;pointer-events:none;
+}
+
+/* progress */
+#progress{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(to bottom, var(--bg) 80%, transparent);
+  padding:18px 0 12px;
+}
+#bar{height:3px;background:var(--line);border-radius:3px;overflow:hidden;}
+#barfill{
+  height:100%;width:0;
+  background:linear-gradient(90deg, var(--accent-mid), var(--accent));
+  border-radius:3px;transition:width .45s cubic-bezier(.4,0,.2,1);
+}
+#steplabel{font-size:11px;color:var(--ink-faint);letter-spacing:.09em;margin-top:7px;}
+
+/* typography */
+h1{font-size:23px;font-weight:700;line-height:1.55;letter-spacing:.01em;}
+h2{font-size:18px;font-weight:700;line-height:1.55;}
+.lead{font-size:14px;color:var(--ink-soft);line-height:1.85;}
+.eyebrow{
+  font-size:10.5px;letter-spacing:.22em;
+  color:var(--accent);font-weight:700;
+}
+
+/* ── ドットモチーフ共通 ── */
+.dot-mark{display:block;width:110px;height:70px;margin:44px 0 22px;}
+/* 各画面右上に薄く配置 */
+.dot-deco{
+  position:absolute;top:4px;right:22px;
+  pointer-events:none;opacity:.6;
+  width:110px;height:90px;
+}
+.dot-deco-left{
+  right:auto;left:22px;
+}
+
+.concept{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:3px solid var(--accent-soft);
+  border-radius:14px;padding:20px;margin:24px 0;
+  font-size:14px;color:var(--ink-soft);line-height:1.95;
+  box-shadow:0 2px 12px rgba(46,158,122,.05);
+}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 30px;}
+.chip{
+  font-size:11.5px;color:var(--ink-soft);
+  background:var(--card);
+  border:1px solid var(--line);
+  padding:6px 13px;border-radius:20px;
+  box-shadow:0 1px 5px rgba(46,158,122,.06);
+}
+
+/* buttons */
+.btn{
+  display:block;width:100%;border:none;cursor:pointer;
+  background:linear-gradient(135deg, var(--accent-mid) 0%, var(--accent) 100%);
+  color:#fff;
+  font-size:16px;font-weight:700;font-family:inherit;
+  padding:16px;border-radius:14px;
+  transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+  box-shadow:0 4px 16px rgba(46,158,122,.28);
+  letter-spacing:.02em;
+}
+.btn:active{transform:scale(.98);box-shadow:0 2px 8px rgba(46,158,122,.18);}
+.btn.ghost{
+  background:transparent;
+  color:var(--accent);
+  border:1.5px solid var(--accent-soft);
+  box-shadow:none;
+}
+.btn.ghost:active{background:var(--accent-bg);}
+
+/* choices */
+.choice{
+  display:block;width:100%;text-align:left;cursor:pointer;
+  background:var(--card);
+  border:1.5px solid var(--line);
+  color:var(--ink);font-size:15px;font-family:inherit;line-height:1.65;
+  padding:15px 17px;border-radius:13px;margin-bottom:10px;
+  transition:border-color .15s ease, background .15s ease, transform .12s ease, box-shadow .15s ease;
+  box-shadow:0 1px 5px rgba(46,158,122,.04);
+}
+.choice:active{transform:scale(.99);}
+.choice.sel{
+  border-color:var(--accent);
+  background:var(--accent-bg);
+  box-shadow:0 2px 12px rgba(46,158,122,.14);
+}
+
+/* attribute */
+.field{margin-bottom:24px;}
+.field-label{
+  font-size:13px;font-weight:700;color:var(--ink);
+  margin-bottom:11px;
+  display:flex;align-items:center;gap:6px;
+}
+.field-label::before{
+  content:'';display:inline-block;width:6px;height:6px;
+  border-radius:50%;background:var(--accent-mid);flex-shrink:0;
+}
+.opts{display:flex;flex-wrap:wrap;gap:9px;}
+.opt{
+  cursor:pointer;font-family:inherit;font-size:13.5px;
+  background:var(--card);border:1.5px solid var(--line);color:var(--ink-soft);
+  padding:10px 15px;border-radius:11px;transition:all .15s ease;
+}
+.opt.sel{
+  border-color:var(--accent);
+  background:var(--accent-bg);
+  color:var(--accent-deep);font-weight:700;
+}
+
+/* question */
+.scene-tag{
+  font-size:10.5px;letter-spacing:.16em;
+  color:var(--accent);font-weight:700;
+  margin-bottom:14px;
+}
+.scene{
+  background:linear-gradient(135deg, var(--accent-bg) 0%, rgba(184,228,212,.3) 100%);
+  border-radius:15px;
+  border:1px solid var(--line);
+  padding:20px 19px 28px;margin-bottom:22px;
+  font-size:15.5px;line-height:1.9;color:var(--ink);
+  position:relative;overflow:hidden;
+}
+.q-ask{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--ink);}
+
+/* mood meter */
+.num-section{margin-bottom:44px;}
+.num-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px;}
+.num-label{font-size:14px;font-weight:700;color:var(--ink);}
+.num-sub{font-size:11px;color:var(--ink-faint);}
+.num-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint);margin:0 2px 9px;}
+.num-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;}
+.num{
+  height:48px;border-radius:11px;cursor:pointer;font-family:inherit;
+  background:var(--card);border:1.5px solid var(--line);
+  color:var(--ink-soft);font-size:15px;font-weight:700;
+  transition:border-color .13s ease,background .13s ease,color .13s ease,transform .12s ease;
+}
+.num:active{transform:scale(.95);}
+.num.sel{
+  outline:2.5px solid var(--accent-deep);
+  outline-offset:1px;
+  box-shadow:0 3px 10px rgba(46,158,122,.30);
+  transform:scale(1.06);
+}
+.readout{
+  text-align:center;
+  background:linear-gradient(135deg, var(--accent-bg) 0%, rgba(168,217,200,.25) 100%);
+  border:1px solid var(--accent-soft);
+  border-radius:14px;padding:16px;margin:8px 0 22px;
+}
+.readout .zone-name{font-size:17px;font-weight:700;color:var(--accent-deep);}
+.readout .ef{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+/* output */
+.block{
+  opacity:0;transform:translateY(32px);
+  transition:opacity 3.5s cubic-bezier(.22,.68,0,1),transform 3.5s cubic-bezier(.22,.68,0,1);
+  margin-bottom:16px;
+}
+.block.show{opacity:1;transform:none;}
+.b-label{font-size:10.5px;letter-spacing:.18em;color:var(--accent);font-weight:700;margin-bottom:9px;}
+.b-card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:21px 20px;
+  font-size:14.5px;line-height:2;color:var(--ink);
+  box-shadow:0 2px 12px rgba(46,158,122,.06);
+}
+.b-card.receive{
+  background:linear-gradient(135deg, var(--accent-bg) 0%, rgba(168,217,200,.2) 100%);
+  border-color:var(--accent-soft);
+  font-size:16px;
+  border-left:3px solid var(--accent-mid);
+}
+.b-card .emo{color:var(--accent-deep);font-weight:700;}
+.b-card.letter{
+  background:linear-gradient(160deg, #F7FEFC 0%, #EEF9F4 100%);
+  border-color:var(--accent-soft);
+  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+  font-size:15.5px;line-height:2.2;white-space:pre-line;
+  box-shadow:0 4px 20px rgba(46,158,122,.09);
+}
+.b-head{font-size:16px;font-weight:700;margin-bottom:11px;color:var(--ink);}
+.reveal-btn{
+  display:block;width:100%;cursor:pointer;font-family:inherit;
+  background:transparent;
+  border:1.5px dashed var(--accent-soft);
+  color:var(--accent);font-size:14px;font-weight:700;
+  padding:14px;border-radius:13px;margin:6px 0 22px;
+  transition:background .2s ease, border-color .2s ease, opacity 1.1s ease, transform 1.1s ease;
+  opacity:0;transform:translateY(8px);
+}
+.reveal-btn.visible{opacity:1;transform:none;}
+.reveal-btn:active{background:var(--accent-bg);}
+
+/* CTA */
+.cta-quiet{
+  margin-top:28px;padding-top:24px;
+  border-top:1px solid var(--line);
+  text-align:center;
+}
+.cta-quiet .eq-line{
+  font-size:13px;color:var(--ink-soft);line-height:1.95;
+  margin-bottom:13px;
+}
+.cta-quiet .eq-line b{color:var(--ink);font-weight:700;}
+.cta-quiet .invite{
+  font-size:12px;color:var(--ink-faint);margin-bottom:11px;
+}
+.cta-quiet a{
+  display:inline-block;font-size:13.5px;font-weight:700;
+  color:var(--accent-deep);text-decoration:none;
+  border-bottom:1.5px solid var(--accent-soft);
+  padding-bottom:3px;transition:opacity .15s ease;
+}
+.cta-quiet a:active{opacity:.55;}
+
+/* result intro */
+.out-intro{text-align:center;margin:30px 0 26px;}
+.out-intro .eyebrow{display:block;margin-bottom:10px;}
+
+/* dev box */
+.devbox{
+  margin-top:14px;border-top:1px solid var(--line);padding-top:14px;
+}
+.devbox summary{
+  font-size:12px;color:var(--ink-faint);cursor:pointer;list-style:none;
+}
+.devbox summary::-webkit-details-marker{display:none;}
+.devgrid{
+  font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.7;
+}
+.devgrid div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted var(--line);}
+.devgrid b{color:var(--ink);font-weight:700;}
+/* ── ローディング ── */
+.loading-wrap{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60vh;gap:24px;
+}
+.loading-dots{display:flex;gap:10px;align-items:center;}
+.loading-dots span{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent);
+  animation:dotpulse 1.4s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2){animation-delay:.2s;}
+.loading-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dotpulse{
+  0%,80%,100%{opacity:.2;transform:scale(.7);}
+  40%{opacity:1;transform:scale(1);}
+}
+.loading-msg{
+  font-size:16px;font-weight:700;color:var(--ink);
+  text-align:center;line-height:1.8;
+}
+.loading-sub{font-size:12px;color:var(--ink-faint);}
+
+.foot{
+  font-size:11px;color:var(--ink-faint);
+  text-align:center;margin-top:30px;line-height:1.75;
+}
+.spacer{height:14px;}
+.spacer-l{height:30px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="progress" style="visibility:hidden">
+    <div id="bar"><div id="barfill"></div></div>
+    <div id="steplabel"></div>
+  </div>
+
+  <!-- ===== INTRO ===== -->
+  <section class="screen on" id="s-intro" style="position:relative">
+    <svg class="dot-deco" viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:90px">
+      <circle cx="94" cy="16" r="11"  fill="#2E9E7A" opacity="1"/>
+      <circle cx="55" cy="16" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="16" cy="16" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="94" cy="52" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="55" cy="52" r="4.5" fill="#2E9E7A" opacity=".3"/>
+      <circle cx="16" cy="52" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="94" cy="82" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="55" cy="82" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="16" cy="82" r="1.5" fill="#2E9E7A" opacity=".09"/>
+    </svg>
+    <p class="eyebrow">Japan EQ ── 簡易診断</p>
+    <div class="spacer"></div>
+    <h1>いま・ここ・私の<br>状態を、知る。</h1>
+    <div class="spacer"></div>
+    <p class="lead">タイプを知るのではなく、<br>いまの自分の状態に気づく診断です。</p>
+    <div class="concept">
+      感情診断の多くは「あなたは○○タイプ」で終わります。でも、EQの本質はタイプを知ることではありません。<br><br>
+      いまこの瞬間の自分の感情に気づき、それに基づいて行動を選べること。それがEQの出発点です。<br><br>
+      この診断は、あなたを分類しません。今日のあなたの状態を受け止め、その上で、今日の自分への気づきを一緒に深めていきます。
+    </div>
+    <div class="meta">
+      <span class="chip">所要 約3分</span>
+      <span class="chip">スマホで完結</span>
+      <span class="chip">データは端末内のみ</span>
+      <span class="chip">全6問＋状態測定</span>
+    </div>
+    <button class="btn" onclick="start()">はじめる</button>
+    <div class="spacer-l"></div>
+  </section>
+
+  <!-- ===== ATTRIBUTES ===== -->
+  <section class="screen" id="s-attr" style="position:relative">
+    <svg class="dot-deco" viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="94" cy="16" r="11"  fill="#2E9E7A" opacity="1"/>
+      <circle cx="55" cy="16" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="16" cy="16" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="94" cy="52" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="55" cy="52" r="4.5" fill="#2E9E7A" opacity=".3"/>
+      <circle cx="16" cy="52" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="94" cy="82" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="55" cy="82" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="16" cy="82" r="1.5" fill="#2E9E7A" opacity=".09"/>
+    </svg>
+    <div class="spacer-l"></div>
+    <p class="eyebrow">Japan EQ ── STEP 1 / あなたについて</p>
+    <div class="spacer"></div>
+    <h2>まず、あなたについて<br>教えてください。</h2>
+    <p class="lead" style="margin-top:8px">立場や状況によって、診断結果のメッセージが変わります。</p>
+    <div class="spacer-l"></div>
+
+    <div class="field">
+      <div class="field-label">年代</div>
+      <div class="opts" id="opt-age"></div>
+    </div>
+    <div class="field">
+      <div class="field-label">いまの立場</div>
+      <div class="opts" id="opt-role"></div>
+    </div>
+    <div class="field">
+      <div class="field-label">性別</div>
+      <div class="opts" id="opt-gender"></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="attr-next" onclick="attrNext()" style="opacity:.4">設問へすすむ</button>
+    <div class="spacer-l"></div>
+  </section>
+
+  <!-- ===== QUESTION ===== -->
+  <section class="screen" id="s-q" style="position:relative">
+    <div class="spacer-l"></div>
+    <div class="scene-tag" id="q-tag"></div>
+    <div class="scene" id="q-scene"></div>
+    <div class="q-ask" id="q-ask"></div>
+    <div id="q-choices"></div>
+    <div class="spacer"></div>
+    <button class="btn" id="q-next" onclick="qNext()" style="opacity:.4;pointer-events:none">次に進む</button>
+    <div class="spacer-l"></div>
+  </section>
+
+  <!-- ===== MOOD METER ===== -->
+  <section class="screen" id="s-mood" style="position:relative">
+    <svg class="dot-deco" viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="94" cy="16" r="11"  fill="#2E9E7A" opacity="1"/>
+      <circle cx="55" cy="16" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="16" cy="16" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="94" cy="52" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="55" cy="52" r="4.5" fill="#2E9E7A" opacity=".3"/>
+      <circle cx="16" cy="52" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="94" cy="82" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="55" cy="82" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="16" cy="82" r="1.5" fill="#2E9E7A" opacity=".09"/>
+    </svg>
+    <div class="spacer-l"></div>
+    <p class="eyebrow">Japan EQ ── STEP 3 / いまの状態</p>
+    <div class="spacer"></div>
+    <h2>いまの自分を、<br>数字で教えてください。</h2>
+    <p class="lead" style="margin-top:10px">
+      いま現在のこころの活力と快適度の状態を、1から12の数字で教えてください。<br>
+      2つの数値から、いまの「感情ゾーン」と「感情語」を導き出します。
+    </p>
+    <div class="spacer-l"></div>
+
+    <div class="num-section">
+      <div class="num-head">
+        <span class="num-label">エネルギー</span>
+        <span class="num-sub">こころの活力</span>
+      </div>
+      <div class="num-scale"><span>1 ・ 力が出ない</span><span>最高の状態 ・ 12</span></div>
+      <div class="num-grid" id="grid-e"></div>
+    </div>
+
+    <div class="num-section">
+      <div class="num-head">
+        <span class="num-label">フィーリング</span>
+        <span class="num-sub">こころの快適度</span>
+      </div>
+      <div class="num-scale"><span>1 ・ 不快</span><span>最高の状態 ・ 12</span></div>
+      <div class="num-grid" id="grid-f"></div>
+    </div>
+
+    <div class="readout">
+      <div class="zone-name" id="mood-zone">──</div>
+      <div class="ef" id="mood-ef">エネルギーとフィーリングを選んでください</div>
+    </div>
+    <button class="btn" id="mood-next" onclick="finish()" style="opacity:.4">結果をみる</button>
+    <div class="spacer-l"></div>
+  </section>
+
+  <!-- ===== LOADING ===== -->
+  <section class="screen" id="s-loading" style="position:relative">
+    <div class="loading-wrap">
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <p class="loading-msg">あなただけの言葉を<br>生成しています…</p>
+      <p class="loading-sub">少々お待ちください</p>
+    </div>
+  </section>
+
+  <!-- ===== OUTPUT ===== -->
+  <section class="screen" id="s-out" style="position:relative">
+    <svg class="dot-deco dot-deco-left" viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="11"  fill="#2E9E7A" opacity="1"/>
+      <circle cx="55" cy="16" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="90" cy="16" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="16" cy="52" r="7"   fill="#2E9E7A" opacity=".55"/>
+      <circle cx="55" cy="52" r="4.5" fill="#2E9E7A" opacity=".3"/>
+      <circle cx="90" cy="52" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="16" cy="82" r="4"   fill="#2E9E7A" opacity=".28"/>
+      <circle cx="55" cy="82" r="2.5" fill="#2E9E7A" opacity=".16"/>
+      <circle cx="90" cy="82" r="1.5" fill="#2E9E7A" opacity=".09"/>
+    </svg>
+    <div class="out-intro">
+      <div class="spacer-l"></div>
+      <span class="eyebrow">今のあなたへ</span>
+      <p class="lead">受け止めから、ひとつずつ。</p>
+    </div>
+    <div id="out-blocks"></div>
+    <div class="foot">
+      この診断は、あなたを分類しません。<br>
+      いまのあなたの状態を、いまのものとして受け止めました。<br><br>
+      Japan EQ 簡易診断 ── いま・ここ・私の状態
+    </div>
+    <div class="spacer-l"></div>
+  </section>
+</div>
+
+<script>
+/* ====================== 診断データ ====================== */
+const AGES=["10代","20代","30代","40代","50代","60代以上"];
+const ROLES=["会社員","管理職","パート・アルバイト","主婦・主夫","学生","その他"];
+const GENDERS=["女性","男性","回答しない"];
+
+/* 設問：Q1-Q3=仮面（mask）, Q4-Q6=アクセル感情（accel） */
+const QUESTIONS=[
+  {tag:"ピンチのとき", scene:"誰かと話していて、自分の言ったひと言で、その場の空気が止まった気がした。", ask:"そのとき、どうした？", kind:"mask",
+   choices:[
+    {t:"「今の言い方、どこがよくなかったんだろう」と思った", k:"perfect"},
+    {t:"あわてて、その場をなんとか取りなそうとした", k:"nice"},
+    {t:"平気なふりをして、そのまま話を続けた", k:"tough"},
+    {t:"「まあいいか」と、気にしないことにした", k:"indiff"}]},
+  {tag:"ピンチのとき", scene:"良かれと思ってかけた言葉が、「そういうのいいから」と返ってきた。", ask:"そのとき、どうした？", kind:"mask",
+   choices:[
+    {t:"どこが良くなかったのかを相手に聞き、次から気をつけようとした", k:"perfect"},
+    {t:"「ごめん」と、すぐに謝って引いた", k:"nice"},
+    {t:"カチンときて、「なら、もういい」と強い口調になった", k:"tough"},
+    {t:"「ふーん」と、それ以上は関わらないことにした", k:"indiff"}]},
+  {tag:"ブレーキのとき", scene:"本当は伝えたいことがあったのに、結局、何も言えないまま終わった。", ask:"そのとき、心の中にあったのは？", kind:"mask",
+   choices:[
+    {t:"うまく言葉にできる自信が、なかった", k:"perfect"},
+    {t:"言ったら相手を困らせるかも、嫌われるかもと思った", k:"nice"},
+    {t:"弱音だと思われたくなかった", k:"tough"},
+    {t:"言っても意味がない、と思った", k:"indiff"}]},
+  {tag:"チャンスのとき", scene:"ずっと続けてきたことが、今日ひとつ、形になった。", ask:"一番「やってきてよかった」と感じたのは？", kind:"accel",
+   choices:[
+    {t:"誰かの役に立てたこと", k:"mission"},
+    {t:"一緒にやってきた人と、喜びを分かち合えたこと", k:"connection"},
+    {t:"前よりできるようになった自分に、気づけたこと", k:"growth"},
+    {t:"周りに認められ、自分の努力を見てもらえたこと", k:"recognition"}]},
+  {tag:"アクセルのとき", scene:"やらなくていい時間なのに、気づいたら、あのことを考えていた。", ask:"それは、どんなことだった？", kind:"accel",
+   choices:[
+    {t:"誰かのために、自分に何ができるか", k:"mission"},
+    {t:"大切な人のこと", k:"connection"},
+    {t:"もっとうまくなりたい、学びたいこと", k:"growth"},
+    {t:"自分が輝ける場面、認められる瞬間", k:"recognition"}]},
+  {tag:"チャンスのとき", scene:"ひと区切りついたあと、身近な誰かから、ひと言もらえた。", ask:"どの言葉が、一番心に残る？", kind:"accel",
+   choices:[
+    {t:"「あなたが動いてくれたから、助かった」", k:"mission"},
+    {t:"「あなたがいてくれて、心強かった」", k:"connection"},
+    {t:"「前よりずっと頼もしくなったね」", k:"growth"},
+    {t:"「やっぱりあなたは、すごいね」", k:"recognition"}]}
+];
+
+/* 立場グループ（受け止め・手紙の出し分け用） */
+function roleGroup(r){
+  if(r==="会社員"||r==="管理職")return "work";
+  if(r==="主婦・主夫")return "home";
+  if(r==="学生")return "student";
+  if(r==="パート・アルバイト")return "parttime";
+  return "other";
+}
+
+/* ① 受け止めの言葉：覚醒帯 × 立場グループ（16ゾーン→4覚醒帯で集約） */
+function getReceive(E, F, grp){
+  const a=arousalBand(E), v=valenceBand(F);
+  // 覚醒帯と快不快で受け止めトーンを決める
+  if(a>=3 && v<=2) return { // 高〜中高覚醒・不快系
+    work:"最近、いろいろなことが立て込んで、頭が休まらない時期が続いているんですね。",
+    home:"最近、気を抜く時間がないまま、毎日を走り抜けてこられたんですね。",
+    student:"最近、やることがいくつも重なって、少し気持ちが急いている時期なんですね。",
+    parttime:"最近、いろんな場所で、いろんな顔をしながら、頑張って過ごされているんですね。",
+    other:"最近、心の休まらない時期が、少し続いているのかもしれませんね。"}[grp];
+  if(a>=3 && v>=3) return { // 高〜中高覚醒・快系
+    work:"最近、手応えを感じながら、前に進めている時期なんですね。",
+    home:"最近、自分の毎日にも、ちょっといい風が吹いている時期なんですね。",
+    student:"最近、なんだか先のことが楽しみで、いろんなことに挑戦したくなっている時期なんですね。",
+    parttime:"最近、忙しいなかにも、前向きな気持ちで過ごせている時期なんですね。",
+    other:"最近、気持ちがいい方向に向かっている時期なんですね。"}[grp];
+  if(a<=2 && v<=2) return { // 低〜中低覚醒・不快系
+    work:"最近、自分のいる場所がこのままでいいのか、少し立ち止まって考えている時期なんですね。",
+    home:"最近、なにか自分の中に「これじゃない」みたいな気持ちを、ずっと抱えてこられたんですね。",
+    student:"最近、少し立ち止まって、自分のこれからを考えている時期なんですね。",
+    parttime:"最近、頑張ってきた分だけ、心が少し静かになっている時期なのかもしれませんね。",
+    other:"最近、心が少し静かに沈んでいる時期が、続いているんですね。"}[grp];
+  return { // 低〜中低覚醒・快系
+    work:"最近、肩の力が少し抜けて、落ち着いて過ごせている時期なんですね。",
+    home:"最近、おだやかな気持ちで、日々を過ごせている時期なんですね。",
+    student:"最近、気持ちがゆったりと落ち着いている時期なんですね。",
+    parttime:"最近、いろんな役割のなかでも、自分のペースを取り戻せている時期なんですね。",
+    other:"最近、心をおだやかに保てている時期なんですね。"}[grp];
+}
+
+/* ② 状態の詳細：覚醒帯 × 快不快で4パターン */
+function getState(E, F){
+  const a=arousalBand(E), v=valenceBand(F);
+  if(a>=3 && v<=2) return "エネルギーはあるのに、心の中が少しざわついている、そんな日かもしれません。やらなきゃいけないことが頭の中で何重にも重なっていて、気持ちがそれに追いつけていない感じ。動ける力はちゃんとあるのに、その動きが滑らかにならない、もどかしさのようなものを抱えているのかも。";
+  if(a>=3 && v>=3) return "エネルギーも高くて、気持ちもいい方向に向いている、いい状態の日かも。やりたいことが頭の中でいくつも動いていて、ぐんと前に進める感じ。こういう日は、勢いに乗って一気に動いていける、貴重な瞬間かもしれません。";
+  if(a<=2 && v<=2) return "エネルギーが少し落ちていて、心も静かに沈んでいる、そんな日かもしれません。怒っているわけでも、悲しいわけでもないけれど、「なんかこれじゃない」という気持ちが、奥のほうにそっとあるかも。こういう日は、無理にテンションを上げようとしなくていい。沈んでいる自分を、そのまま許してあげられたら。";
+  return "エネルギーは少しおだやかだけれど、心はちゃんと落ち着いている、いい意味で静かな日かもしれません。大きく前に進む感じではないけれど、足元はしっかりしている。こういう日は、無理に動かそうとせず、いまある落ち着きを、そのまま味わっていられたら。";
+}
+
+/* 感情語は ZONE_WORD から取得（emotionWord関数は zoneKey経由） */
+
+/* ③ 仮面への気づき */
+const MASK={
+  perfect:{name:"完璧の仮面",
+    text:"もしかして、「ちゃんとやらないと」が口ぐせになっていませんか？\n\n自分にも、周りにも、知らないうちに高い基準を求めすぎてしまっているのかもしれません。本当はもう十分やれているのに、「まだ足りない」と自分にダメ出ししてしまうこと、心当たりがあるかも。"},
+  nice:{name:"いいひとの仮面",
+    text:"もしかして、周りの人に「嫌われたくない」「がっかりされたくない」って、ずっと思っていませんか？\n\n自分の気持ちを後回しにして、相手に合わせてしまうこと、毎日のように起きているのかも。「自分が我慢すれば丸く収まる」って、いつの間にか当たり前になっていませんか。"},
+  tough:{name:"強がりの仮面",
+    text:"もしかして、「弱いところを見せたくない」って、ずっと思っていませんか？\n\nできないことを「できない」と言うのが、ちょっと怖い。だから、一人で頑張りすぎて、本当は誰かに聞けば早いことも、自分で抱え込んでしまうこと、あるかも。"},
+  indiff:{name:"無関心の仮面",
+    text:"もしかして、「期待しすぎないほうがラク」って、思うようになっていませんか？\n\n本当は認められたい、見てもらいたい気持ちがあるのに、それを表に出して期待外れになるのが怖くて、最初から「別に興味ない」みたいな態度を取ってしまうこと、あるかも。本当は、ちゃんと熱があるのに。"}
+};
+
+/* ④ ジレンマ：アクセル感情 × 仮面 の素材 */
+const ACCEL={
+  mission:{name:"使命・貢献", wish:"誰かの役に立ちたい", drive:"人の役に立ちたいから、ちゃんとやりたい"},
+  connection:{name:"つながり・愛情", wish:"大切な人と、ちゃんとつながっていたい", drive:"つながりを大事にしたいから、相手に向き合いたい"},
+  growth:{name:"成長", wish:"成長した自分を、ちゃんと認めてほしい", drive:"成長したいから、できる姿を見せたい"},
+  recognition:{name:"承認・輝き", wish:"すごいって思われたい", drive:"認められたいから、頑張りたい"}
+};
+const MASK_DILEMMA={
+  perfect:{fear:"完璧にできないと意味がない", block:"「まだ足りない」と自分を追い込んでしまう"},
+  nice:{fear:"嫌われたくない、がっかりされたくない", block:"自分の気持ちを、いつも後回しにしてしまう"},
+  tough:{fear:"弱いところは、見せたくない", block:"できない自分を見せられず、挑戦の幅が知らないうちに狭まってしまう"},
+  indiff:{fear:"どうせ、分かってくれない", block:"傷つく前に、本気を出さないでおいてしまう"}
+};
+function dilemmaText(accelK,maskK){
+  const a=ACCEL[accelK], m=MASK_DILEMMA[maskK];
+  return "「"+a.wish+"」という気持ちと、「"+m.fear+"」という気持ちが、心の中に両方あったりしませんか？\n\n"
+    +a.drive+"。でも、"+m.block+"。そのふたつが静かにぶつかり合って、自分で自分の力を出しきれなくなっているのかもしれません。本当はもっと、見せられるものがあるのに。";
+}
+
+/* ⑤ 手紙：立場グループ */
+const LETTER={
+  work:"今日のあなたへ。\n\nずっと、何かを背負って歩いてきましたね。\n誰かのために、何かを守るために、\n走り続けてきた時間が、たしかにあったと思う。\n\n今日くらいは、その背中を、\n誰かに見ていてもらってもいい。",
+  home:"今日のあなたへ。\n\n誰かのために、たくさん動いてきた一日でしたね。\nありがとうって、言われたかもしれない。\n言われなかったかもしれない。\n\nそれでも、あなたが今日、たしかに誰かのそばにいたこと。\nそれを、ここに残しておきます。",
+  student:"今日のあなたへ。\n\n前へ進みたい気持ちが、いっぱいに膨らんでいる日ですね。\n強くいなきゃ、ちゃんとしなきゃって、\n肩に少し力が入っているかもしれない。\n\nその「進みたい」という気持ちごと、\nちゃんと、あなたのものです。",
+  parttime:"今日のあなたへ。\n\nいろんな場所で、いろんな名前で呼ばれてきましたね。\nどの呼び名でも、\nあなたはあなたとして、そこに立っていた。\n\nそのことを、今日くらいは、\n自分でも見てあげてください。",
+  other:"今日のあなたへ。\n\n今日も、あなたなりのやり方で、一日を過ごしてきましたね。\nうまくいったことも、そうでなかったことも、\nぜんぶ、ふくめて。\n\nあなたが今日、ここにいること。\nそれだけで、もう十分だと思う。"
+};
+
+
+
+/* ★ JapanEQフル診断の導線リンク：URL確定後、この1行だけ差し替えてください ★ */
+const FULL_DIAG_URL="https://www.japan-learning.co.jp/eq-2/";  /* Japan EQ 詳細ページ */
+
+/* ====================== 状態 ====================== */
+const ST={age:null,role:null,gender:null,answers:[],qi:0,E:null,F:null};
+
+/* 連打防止：処理中・状態遷移中は全インタラクションをロック */
+let LOCK=false;
+function lockOn(){ LOCK=true; document.body.classList.add('busy'); }
+function lockOff(){ LOCK=false; document.body.classList.remove('busy'); }
+
+/* ====================== 画面制御 ====================== */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function setProgress(step,total,label){
+  const p=document.getElementById('progress');
+  p.style.visibility = step? 'visible':'hidden';
+  document.getElementById('barfill').style.width=(step/total*100)+'%';
+  document.getElementById('steplabel').textContent=label||'';
+}
+
+/* ---- イントロ ---- */
+function start(){ if(LOCK)return; lockOn(); buildAttr(); show('s-attr'); setProgress(1,9,'STEP 1 / 属性'); setTimeout(lockOff,300); }
+
+/* ---- 属性入力 ---- */
+function buildAttr(){
+  const mk=(arr,box,key)=>{
+    const el=document.getElementById(box); el.innerHTML='';
+    arr.forEach(v=>{
+      const b=document.createElement('button');
+      b.className='opt'; b.textContent=v;
+      b.onclick=()=>{
+        ST[key]=v;
+        el.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+        b.classList.add('sel');
+        checkAttr();
+      };
+      el.appendChild(b);
+    });
+  };
+  mk(AGES,'opt-age','age');
+  mk(ROLES,'opt-role','role');
+  mk(GENDERS,'opt-gender','gender');
+}
+function checkAttr(){
+  const ok=ST.age&&ST.role&&ST.gender;
+  document.getElementById('attr-next').style.opacity=ok?'1':'.4';
+}
+function attrNext(){
+  if(LOCK)return;
+  if(!(ST.age&&ST.role&&ST.gender))return;
+  lockOn();
+  ST.qi=0; ST.answers=[];
+  renderQ(); show('s-q');
+  setTimeout(lockOff,300);
+}
+
+/* ---- 設問 ---- */
+function renderQ(){
+  const q=QUESTIONS[ST.qi];
+  setProgress(2+ST.qi,9,'STEP 2 / 設問 '+(ST.qi+1)+' of 6');
+  document.getElementById('q-tag').textContent='Q'+(ST.qi+1)+'  ──  '+q.tag;
+  document.getElementById('q-scene').textContent=q.scene;
+  document.getElementById('q-ask').textContent=q.ask;
+  /* 次へボタンをリセット */
+  const nextBtn=document.getElementById('q-next');
+  nextBtn.style.opacity='.4';
+  nextBtn.style.pointerEvents='none';
+  const box=document.getElementById('q-choices'); box.innerHTML='';
+  q.choices.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='choice'; b.textContent=c.t;
+    b.onclick=()=>{
+      if(LOCK)return;
+      box.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      ST.answers[ST.qi]={kind:q.kind,k:c.k};
+      nextBtn.style.opacity='1';
+      nextBtn.style.pointerEvents='auto';
+    };
+    box.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+function qNext(){
+  if(LOCK)return;
+  if(!ST.answers[ST.qi])return;
+  lockOn();
+  if(ST.qi<QUESTIONS.length-1){ ST.qi++; renderQ(); window.scrollTo(0,0); }
+  else { show('s-mood'); setProgress(8,9,'STEP 3 / いまの状態'); buildMood(); }
+  setTimeout(lockOff,300);
+}
+
+/* ---- ムードメーター判定 ---- */
+/* 覚醒度（E）: 1-3=低, 4-6=中低, 7-9=中高, 10-12=高 */
+/* 快不快（F）: 1-3=不快, 4-6=やや不快, 7-9=やや快, 10-12=快 */
+function arousalBand(E){
+  if(E>=10)return 4; // 高覚醒
+  if(E>=7) return 3; // 中高覚醒
+  if(E>=4) return 2; // 中低覚醒
+  return 1;          // 低覚醒
+}
+function valenceBand(F){
+  if(F>=10)return 4; // 快
+  if(F>=7) return 3; // やや快
+  if(F>=4) return 2; // やや不快
+  return 1;          // 不快
+}
+
+/* 16ゾーンラベル */
+const ZONE_LABEL={
+  "4-1":"高覚醒・不快",   "4-2":"高覚醒・やや不快", "4-3":"高覚醒・やや快",   "4-4":"高覚醒・快",
+  "3-1":"中高覚醒・不快", "3-2":"中高覚醒・やや不快","3-3":"中高覚醒・やや快", "3-4":"中高覚醒・快",
+  "2-1":"中低覚醒・不快", "2-2":"中低覚醒・やや不快","2-3":"中低覚醒・やや快", "2-4":"中低覚醒・快",
+  "1-1":"低覚醒・不快",   "1-2":"低覚醒・やや不快",  "1-3":"低覚醒・やや快",   "1-4":"低覚醒・快"
+};
+
+/* 16ゾーン代表語（ゾーン代表語テーブルシート） */
+const ZONE_WORD={
+  "4-1":"恐怖",  "4-2":"怒り",  "4-3":"情熱",  "4-4":"歓喜",
+  "3-1":"不安",  "3-2":"葛藤",  "3-3":"期待",  "3-4":"感動",
+  "2-1":"嫌悪",  "2-2":"後悔",  "2-3":"安心",  "2-4":"幸福",
+  "1-1":"失望",  "1-2":"疲労",  "1-3":"冷静",  "1-4":"平穏"
+};
+
+function zoneKey(E,F){ return arousalBand(E)+"-"+valenceBand(F); }
+function zoneOf(E,F){ return zoneKey(E,F); }
+function zoneName(E,F){ return ZONE_LABEL[zoneKey(E,F)]||""; }
+
+/* 12×12感情語マトリクス（スコアマップシート）
+   EMOTION_MAP[E-1][F-1] でアクセス。E=覚醒(行), F=快不快(列) */
+const EMOTION_MAP=[
+  /* E=1 */ ["絶望","ふさぎこむ","意気消沈","しょげ返る","ぐったり","無気力","眠気","思いにふける","休まる","くつろぎ","安らぎ","心の凪"],
+  /* E=2 */ ["悲しい","失望","無力感","消耗した","疲労","倦怠感","落ち着き","冷静","快適","心地よい","平穏","おだやか"],
+  /* E=3 */ ["喪失感","むなしい","疎外感","孤独感","だるい","まんねり","淡々とした","平然とした","飄々とした","のんびり","うっとり","バランス"],
+  /* E=4 */ ["苦悶","うんざり","反感","あきらめ","落ち込む","難しい","リラックス","のんき","じんわり","豊かさ","温もり","癒し"],
+  /* E=5 */ ["恨み","嫌悪","敵意","寂しさ","後悔","つまらない","穏やか","安心","ほっとする","恵まれている","幸福","充実感"],
+  /* E=6 */ ["拒絶","軽蔑","むかつく","がっかり","裏切られた","退屈","気楽","楽観的","充足感","イキイキ","満足","愛おしい"],
+  /* E=7 */ ["つらい","おじけづく","心配","自己嫌悪","困る","動揺","愉快","好奇心","わくわく","ぞくぞくする","胸の高鳴り","誇りに思う"],
+  /* E=8 */ ["青ざめる","不安","萎縮する","焦り","葛藤","もどかしい","楽しみ","期待","希望","ときめき","感動","爽快感"],
+  /* E=9 */ ["逃げ出したい","気が気でない","うろたえる","嫉妬","恥ずかしい","驚き","冒険心","憧れ","喜び","解放感","恍惚","達成感"],
+  /* E=10 */["追い詰められる","怯える","震える","憤り","イライラ","緊張","使命感","熱意","没頭する","興奮","勝利感","夢中になる"],
+  /* E=11 */["叫びたい","恐怖","血の気が引く","あぜんとする","怒り","危機感","気合い","情熱","やる気満々","燃える","歓喜","心が震える"],
+  /* E=12 */["戦慄","制御不能","パニック","激怒","神経質","戦闘態勢","闘志","高揚感","爆発的","お祭り気分","熱狂","有頂天"]
+];
+
+function emotionWord(zone,F){ return ZONE_WORD[zone]||""; }
+/* 12×12マップから直接引く感情語 */
+function emotionWordExact(E,F){ return EMOTION_MAP[E-1][F-1]||""; }
+function buildMood(){
+  const mk=(boxId,key)=>{
+    const el=document.getElementById(boxId); el.innerHTML='';
+    for(let n=1;n<=12;n++){
+      const b=document.createElement('button');
+      b.className='num'; b.textContent=n;
+      /* エネルギー: 1=白→12=濃、フィーリング: 1=濃→12=白 */
+      const t = key==='E' ? (n-1)/11 : (12-n)/11;
+      const r=Math.round(255+(46-255)*t);
+      const g=Math.round(255+(158-255)*t);
+      const bv=Math.round(255+(122-255)*t);
+      const borderA=0.15+0.65*t;
+      const textL=t>0.45?'#fff':'var(--ink-soft)';
+      b.style.background=`rgb(${r},${g},${bv})`;
+      b.style.borderColor=`rgba(46,158,122,${borderA})`;
+      b.style.color=textL;
+      b.onclick=()=>{
+        ST[key]=n;
+        el.querySelectorAll('.num').forEach(x=>x.classList.remove('sel'));
+        b.classList.add('sel');
+        updateMood();
+      };
+      el.appendChild(b);
+    }
+  };
+  mk('grid-e','E');
+  mk('grid-f','F');
+  updateMood();
+}
+function updateMood(){
+  const btn=document.getElementById('mood-next');
+  if(ST.E==null||ST.F==null){
+    document.getElementById('mood-zone').textContent='──';
+    document.getElementById('mood-ef').textContent='エネルギーとフィーリングを選んでください';
+    btn.style.opacity='.4';
+    return;
+  }
+  const z=zoneOf(ST.E,ST.F);
+  const exact=emotionWordExact(ST.E,ST.F);
+  const rep=ZONE_WORD[z];
+  const wordDisplay = exact===rep ? exact : rep+'・'+exact;
+  document.getElementById('mood-zone').textContent=wordDisplay+'（'+zoneName(ST.E,ST.F)+'）';
+  document.getElementById('mood-ef').textContent='エネルギー '+ST.E+' ・ フィーリング '+ST.F;
+  btn.style.opacity='1';
+}
+
+/* ---- 判定 ---- */
+function tally(kind){
+  const c={};
+  ST.answers.filter(a=>a.kind===kind).forEach(a=>{c[a.k]=(c[a.k]||0)+1;});
+  let best=null,bestN=-1;
+  const order = kind==="mask"
+    ? ["perfect","nice","tough","indiff"]
+    : ["mission","connection","growth","recognition"];
+  order.forEach(k=>{ if((c[k]||0)>bestN){bestN=c[k]||0;best=k;} });
+  return best;
+}
+
+/* ---- 結果生成（AI） ---- */
+async function finish(){
+  if(LOCK)return;
+  if(ST.E==null||ST.F==null)return;
+  lockOn();
+
+  const zone=zoneOf(ST.E,ST.F);
+  const word=emotionWordExact(ST.E,ST.F);
+  const maskK=tally("mask");
+  const accelK=tally("accel");
+  const grp=roleGroup(ST.role);
+
+  /* ローディング表示 */
+  show('s-loading');
+  setProgress(9,9,'結果を生成中…');
+
+  /* ---- プロンプト組み立て ---- */
+  const profileText=`年代：${ST.age}／立場：${ST.role}／性別：${ST.gender}`;
+  const zoneLabel=zoneName(ST.E,ST.F);
+  const zoneRepWord=ZONE_WORD[zone];
+  const maskName=MASK[maskK].name;
+  const accelName=ACCEL[accelK].name;
+
+  /* 参考テンプレート（各ブロックの世界観・トーンの手がかり） */
+  const ref1=getReceive(ST.E,ST.F,grp)||"いまのあなたの状態を、静かに受け止めています。";
+  const ref2=getState(ST.E,ST.F)||"いまの感情の状態を、そのまま受け止めてみてください。";
+  const ref3=MASK[maskK].text;
+  const ref4=dilemmaText(accelK,maskK);
+  const ref5=LETTER[grp];
+
+  const prompt=`あなたはEQ感情診断の専門家として、利用者への診断結果メッセージを生成します。
+
+## 利用者プロフィール
+${profileText}
+
+## 診断結果
+- 感情状態ゾーン：${zoneLabel}
+- ゾーン代表語：${zoneRepWord}
+- 感情語（精細）：${word}
+- 感情語：${word}
+- 不安パターン（仮面）：${maskName}
+- アクセル感情：${accelName}
+- エネルギー（E）：${ST.E} ／ フィーリング（F）：${ST.F}
+
+## 出力形式
+以下の5ブロックを、必ずJSON形式で出力してください。
+キーは block1〜block5、値は文字列です。改行は\\nで表現してください。
+JSONのみ出力し、前後に説明や\`\`\`は不要です。
+
+## 各ブロックの要件
+
+**block1（受け止めの言葉）**
+利用者の感情状態ゾーン・立場から「いまの状態を受け止める」メッセージ。
+2〜3文。温かく、断定せず、寄り添う語調。「〜なんですね」「〜かもしれませんね」で締める。
+参考トーン：「${ref1}」
+
+**block2（いま、こんな状態かも）**
+冒頭は必ず「いまの感情は『${word}』かな。」から始める。
+続けてエネルギーとフィーリングの状態を温かく映し出す。ゾーン代表語「${zoneRepWord}」も意識したトーンで。3〜5文。
+参考トーン：「${ref2}」
+
+**block3（もしかして…こうかも？）**
+${maskName}への気づきを促す。「もしかして〜」から始める。
+断定せず、心当たりを問いかける語調。3〜4文。
+参考トーン：「${ref3}」
+
+**block4（こんなこと、考えてない？）**
+${accelName}という願いと${maskName}の不安のジレンマを言語化する。
+「〜という気持ちと〜という気持ちが、心の中に両方あったりしませんか？」の構造を使う。4〜5文。
+参考トーン：「${ref4}」
+
+**block5（いまのあなたに送る言葉）**
+「今日のあなたへ。」から始まる手紙風メッセージ。
+受け止め・労い・承認で包み込む。行動提案は含めない。4〜6行、改行多め。
+参考トーン：「${ref5}」
+
+## 文体の注意
+- です・ます調は使わない。「〜ですね」「〜かもしれません」程度はOK
+- 診断・分析的な言い回しを避け、語りかける温かいトーンで
+- 利用者の立場（${ST.role}）・年代（${ST.age}）に自然に合った表現を選ぶ
+- 各ブロックは独立して読めるようにする`;
+
+  let aiBlocks=null;
+
+  try {
+    const res=await fetch("/api/generate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        messages:[{role:"user",content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content.map(c=>c.text||"").join("");
+    const clean=text.replace(/```json|```/g,"").trim();
+    aiBlocks=JSON.parse(clean);
+  } catch(e){
+    console.error("AI生成エラー、フォールバックを使用:",e);
+  }
+
+  /* フォールバック（API失敗時は既存テンプレートで表示） */
+  const b1=aiBlocks?.block1||ref1;
+  const b2=aiBlocks?.block2||("いまの感情は『"+word+"』かな。\n\n"+ref2);
+  const b3=aiBlocks?.block3||ref3;
+  const b4=aiBlocks?.block4||ref4;
+  const b5=aiBlocks?.block5||ref5;
+
+  const blocks=[
+    {label:"① 受け止めの言葉", cls:"receive", head:null, body:b1},
+    {label:"② いま、こんな状態かも", cls:"", head:"② いま、こんな状態かも", body:b2},
+    {label:"③ もしかして…こうかも？", cls:"", head:"③ もしかして…こうかも？", body:b3},
+    {label:"④ こんなこと、考えてない？", cls:"", head:"④ こんなこと、考えてない？", body:b4},
+    {label:"⑤ いまのあなたに送る言葉", cls:"letter", head:null, body:b5}
+  ];
+
+  const revealLabels=[
+    "▼ いまの状態を、もう少し見てみる",
+    "▼ もう一段、心の奥へ",
+    "▼ さらに、奥へ",
+    "▼ 最後に、あなたへ"
+  ];
+
+  const wrap=document.getElementById('out-blocks');
+  wrap.innerHTML='';
+  blocks.forEach((b,i)=>{
+    const sec=document.createElement('div');
+    sec.className='block'; sec.id='blk'+i;
+    let html='';
+    if(b.label && b.cls!=='letter') html+='<div class="b-label">'+b.label+'</div>';
+    html+='<div class="b-card '+b.cls+'">';
+    if(b.head) html+='<div class="b-head">'+b.head+'</div>';
+    html+=b.body.replace(/\n/g,'<br>');
+    html+='</div>';
+    sec.innerHTML=html;
+    wrap.appendChild(sec);
+
+    if(i<blocks.length-1){
+      const btn=document.createElement('button');
+      btn.className='reveal-btn'; btn.id='rev'+i;
+      btn.textContent=revealLabels[i];
+      btn.onclick=()=>{
+        if(LOCK)return;
+        lockOn();
+        document.getElementById('blk'+(i+1)).classList.add('show');
+        btn.style.display='none';
+        if(i+1<blocks.length-1){
+          setTimeout(()=>{
+            const next=document.getElementById('rev'+(i+1));
+            if(next){ next.style.display='block'; requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('visible'))); }
+          },700);
+        }
+        if(i+1===blocks.length-1){
+          const c=document.getElementById('cta');
+          if(c) setTimeout(()=>c.classList.add('show'),650);
+        }
+        setTimeout(()=>{
+          const el=document.getElementById('blk'+(i+1));
+          const prog=document.getElementById('progress');
+          const offset=(prog?prog.getBoundingClientRect().bottom:0)+16;
+          const top=el.getBoundingClientRect().top+window.scrollY-offset;
+          window.scrollTo({top,behavior:'smooth'});
+        },60);
+        setTimeout(lockOff,500);
+      };
+      wrap.appendChild(btn);
+    }
+  });
+
+  /* 導線 */
+  const cta=document.createElement('div');
+  cta.className='block'; cta.id='cta';
+  cta.innerHTML=
+    '<div class="cta-quiet">'
+    +'<div class="eq-line">いま・ここ・自分にフォーカスして、感情を起点に行動の変化を<br>つくっていくトレーニングが「EQ」です。</div>'
+    +'<div class="invite">詳細な診断、トレーニングに関心のある方はこちらへ。</div>'
+    +'<a id="cta-link">Japan EQ について、詳しく →</a>'
+    +'</div>';
+  wrap.appendChild(cta);
+  const ctaLink=document.getElementById('cta-link');
+  ctaLink.href=FULL_DIAG_URL||'#';
+  ctaLink.target='_blank';
+  ctaLink.rel='noopener';
+
+  /* 開発者用 */
+  const dev=document.createElement('details');
+  dev.className='devbox';
+  dev.innerHTML='<summary>▸ 診断ロジックの内訳（開発者用）</summary>'
+    +'<div class="devgrid">'
+    +'<div><span>属性</span><b>'+ST.age+' / '+ST.role+' / '+ST.gender+'</b></div>'
+    +'<div><span>ムードメーター</span><b>E'+ST.E+' × F'+ST.F+'</b></div>'
+    +'<div><span>感情状態ゾーン</span><b>'+zoneName(ST.E,ST.F)+'</b></div>'
+    +'<div><span>感情語</span><b>'+word+'</b></div>'
+    +'<div><span>不安パターン（仮面）</span><b>'+MASK[maskK].name+'</b></div>'
+    +'<div><span>アクセル感情</span><b>'+ACCEL[accelK].name+'</b></div>'
+    +'<div><span>生成方式</span><b>'+(aiBlocks?'AI生成':'フォールバック')+'</b></div>'
+    +'</div>';
+  wrap.appendChild(dev);
+
+  /* 再診断 */
+  const again=document.createElement('button');
+  again.className='btn ghost';
+  again.style.marginTop='22px';
+  again.textContent='もう一度、いまの自分を診断する';
+  again.onclick=()=>{ if(LOCK)return; lockOn(); again.disabled=true; location.reload(); };
+  wrap.appendChild(again);
+
+  show('s-out');
+  setProgress(9,9,'結果');
+  setTimeout(()=>{
+    document.getElementById('blk0').classList.add('show');
+    setTimeout(()=>{
+      const r=document.getElementById('rev0');
+      if(r){ r.style.display='block'; requestAnimationFrame(()=>requestAnimationFrame(()=>r.classList.add('visible'))); }
+    },700);
+  },120);
+  setTimeout(lockOff,350);
+}
+</script>
+</body>
+</html>

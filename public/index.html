@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>いま・ここ・私の状態 — Japan EQ 簡易診断</title>
+<title>いま・ここ・私の感情と向き合う — Japan EQ 簡易診断</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
 
@@ -243,6 +243,24 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
   font-size:14.5px;line-height:2;color:var(--ink);
   box-shadow:0 2px 12px rgba(46,158,122,.06);
 }
+.b-card.tane{
+  background:linear-gradient(135deg, #F0FBF6 0%, #E8F7F0 100%);
+  border-color:var(--accent-mid);
+  border-left:4px solid var(--accent-deep);
+  font-size:15px;
+  line-height:2.1;
+  position:relative;
+}
+.b-card.tane::before{
+  content:"✦ 気づきのタネ明かし";
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.1em;
+  color:var(--accent-deep);
+  margin-bottom:12px;
+  opacity:.8;
+}
 .b-card.receive{
   background:linear-gradient(135deg, var(--accent-bg) 0%, rgba(168,217,200,.2) 100%);
   border-color:var(--accent-soft);
@@ -362,13 +380,13 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
     </svg>
     <p class="eyebrow">Japan EQ ── 簡易診断</p>
     <div class="spacer"></div>
-    <h1>いま・ここ・私の<br>状態を、知る。</h1>
+    <h1>いま・ここ・私の<br>感情と向き合う。</h1>
     <div class="spacer"></div>
     <p class="lead">タイプを知るのではなく、<br>いまの自分の状態に気づく診断です。</p>
     <div class="concept">
-      感情診断の多くは「あなたは○○タイプ」で終わります。でも、EQの本質はタイプを知ることではありません。<br><br>
-      いまこの瞬間の自分の感情に気づき、それに基づいて行動を選べること。それがEQの出発点です。<br><br>
-      この診断は、あなたを分類しません。今日のあなたの状態を受け止め、その上で、今日の自分への気づきを一緒に深めていきます。
+      この診断は、あなたを分類しません。<br><br>
+      私たちは毎日、見えない何かに動かされながら行動しています。でも、それが何かに気づいていることは、ほとんどありません。<br><br>
+      6つの場面で行動を選ぶだけで、あなたが普段意識していないものが、静かに浮かび上がってきます。
     </div>
     <div class="meta">
       <span class="chip">所要 約3分</span>
@@ -525,42 +543,42 @@ const GENDERS=["女性","男性","回答しない"];
 
 /* 設問：Q1-Q3=仮面（mask）, Q4-Q6=アクセル感情（accel） */
 const QUESTIONS=[
-  {tag:"こころがざわついたとき", scene:"誰かと話していて、自分の言ったひと言で、その場の空気が止まった気がした。", ask:"いまのあなたならどう行動する？", kind:"mask",
+  {tag:"こころがざわついたとき", scene:"自分の言葉で、誰かの表情が曇った気がした。", ask:"そのとき、あなたはどうする？", kind:"mask",
    choices:[
-    {t:"自分の言い方を振り返って、よりよい伝え方を考える", k:"perfect"},
-    {t:"その場をなんとか取りなして、空気をやわらげる", k:"nice"},
-    {t:"何事もなかったように、そのまま話を続ける", k:"tough"},
-    {t:"気にしないことにして、そのまま流す", k:"indiff"}]},
-  {tag:"こころがざわついたとき", scene:"良かれと思ってかけた言葉が、「そういうのいいから」と返ってきた。", ask:"いまのあなたならどう行動する？", kind:"mask",
+    {t:"何がいけなかったか振り返る", k:"perfect"},
+    {t:"すぐにフォローして場を和らげる", k:"nice"},
+    {t:"気にせずそのまま続ける", k:"tough"},
+    {t:"もう関わらないようにする", k:"indiff"}]},
+  {tag:"こころがざわついたとき", scene:"頑張ったのに、思ったような反応が返ってこなかった。", ask:"そのとき、あなたはどうする？", kind:"mask",
    choices:[
-    {t:"どこがよくなかったかを聞いて、次から気をつける", k:"perfect"},
-    {t:"すぐに「ごめん」と謝って、引く", k:"nice"},
-    {t:"カチンときた気持ちを抑えず、はっきり言い返す", k:"tough"},
-    {t:"それ以上は関わらないことにする", k:"indiff"}]},
-  {tag:"ことばを飲み込んだとき", scene:"本当は伝えたいことがあったのに、結局、何も言えないまま終わった。", ask:"いまのあなたならどう行動する？", kind:"mask",
+    {t:"次はどうすべきか、自分なりに考える", k:"perfect"},
+    {t:"「ごめん」とすぐに謝る", k:"nice"},
+    {t:"「自分は間違っていない」と思う", k:"tough"},
+    {t:"そっと距離を置く", k:"indiff"}]},
+  {tag:"ことばを飲み込んだとき", scene:"本当は言いたいことがあったのに、結局言えなかった。", ask:"そのとき、あなたはどうする？", kind:"mask",
    choices:[
-    {t:"ちゃんと伝わる言葉を準備して、もう一度向き合う", k:"perfect"},
-    {t:"相手を困らせないやり方を探して、そっと切り出す", k:"nice"},
-    {t:"弱音と思われない伝え方で、改めて伝える", k:"tough"},
-    {t:"もう言わないでおく。言っても何も変わらない", k:"indiff"}]},
-  {tag:"チャンスのとき", scene:"ずっと続けてきたことが、今日ひとつ、形になった。", ask:"一番「やってきてよかった」と感じたのは？", kind:"accel",
+    {t:"伝わる言葉を考えて、もう一度向き合う", k:"perfect"},
+    {t:"相手を傷つけない言い方を探す", k:"nice"},
+    {t:"弱音と思われないよう言い方を変えて伝える", k:"tough"},
+    {t:"もう言わないと決める", k:"indiff"}]},
+  {tag:"こころが温かくなったとき", scene:"誰かから「ありがとう」と言われた瞬間。", ask:"一番うれしかったのは、どんなこと？", kind:"accel",
    choices:[
-    {t:"誰かの役に立てたこと", k:"mission"},
-    {t:"一緒にやってきた人と、喜びを分かち合えたこと", k:"connection"},
-    {t:"前よりできるようになった自分に、気づけたこと", k:"growth"},
-    {t:"周りに認められ、自分の努力を見てもらえたこと", k:"recognition"}]},
-  {tag:"こころが動いたとき", scene:"やらなくていい時間なのに、気づいたら、あのことを考えていた。", ask:"いまのあなたならどう行動する？", kind:"accel",
+    {t:"役に立てたことが嬉しかった", k:"mission"},
+    {t:"その人の笑顔が嬉しかった", k:"connection"},
+    {t:"自分の成長を感じた", k:"growth"},
+    {t:"認めてもらえた気がした", k:"recognition"}]},
+  {tag:"こころが動いたとき", scene:"何かに夢中になって、時間を忘れていた。", ask:"それを続けていた一番の理由は？", kind:"accel",
    choices:[
-    {t:"そのことのために、いま自分にできることを始める", k:"mission"},
-    {t:"まず大切な人に、その気持ちを伝える", k:"connection"},
-    {t:"学べる場や機会を、自分から探しに行く", k:"growth"},
-    {t:"褒めてもらえそうな場面で、自分から手を挙げる", k:"recognition"}]},
-  {tag:"こころが動いたとき", scene:"ひと区切りついたあと、身近な誰かから、ひと言もらえた。", ask:"いまのあなたならどう行動する？", kind:"accel",
+    {t:"誰かの役に立てると思ったから", k:"mission"},
+    {t:"大切な人と共有したかったから", k:"connection"},
+    {t:"もっとうまくなりたかったから", k:"growth"},
+    {t:"得意なことを活かせると思ったから", k:"recognition"}]},
+  {tag:"こころが満たされたとき", scene:"ずっと続けてきたことが、ようやく報われた。", ask:"そのとき、一番心に残ったのは？", kind:"accel",
    choices:[
-    {t:"もらった気持ちを、次は誰かのために動く力に変える", k:"mission"},
-    {t:"その人にも、自分の気持ちを言葉で返す", k:"connection"},
-    {t:"言われた言葉を、次の成長の指針にする", k:"growth"},
-    {t:"自分の歩みを、見える形でもう一度発信する", k:"recognition"}]}
+    {t:"誰かの力になれたと感じた", k:"mission"},
+    {t:"一緒に喜べる人がいた", k:"connection"},
+    {t:"自分の成長を実感できた", k:"growth"},
+    {t:"努力を見てもらえた気がした", k:"recognition"}]}
 ];
 
 /* 立場グループ（受け止め・手紙の出し分け用） */
@@ -895,6 +913,26 @@ async function finish(){
   const ref4=dilemmaText(accelK,maskK);
   const ref5=LETTER[grp];
 
+  /* タネ明かし用：Q1の場面と選択肢テキストを取得 */
+  const taneQ=QUESTIONS[0];
+  const taneAns=ST.answers[0];
+  const taneScene=taneQ.scene;
+  const taneChoice=taneQ.choices.find(c=>c.k===taneAns.k)?.t||"";
+  const maskEmotionMap={
+    perfect:"「失敗したくない」という恐れ",
+    nice:"「嫌われたくない」という不安",
+    tough:"「弱く見られたくない」というプライド",
+    indiff:"「傷つきたくない」という自己防衛"
+  };
+  const accelEmotionMap={
+    mission:"使命・貢献への感情",
+    connection:"つながり・愛情への感情",
+    growth:"成長への感情",
+    recognition:"承認・輝きへの感情"
+  };
+  const maskEmotion=maskEmotionMap[maskK]||maskName;
+  const accelEmotion=accelEmotionMap[accelK]||accelName;
+
   const prompt=`あなたはEQ感情診断の専門家として、利用者への診断結果メッセージを生成します。
 
 ## 利用者プロフィール
@@ -905,16 +943,27 @@ ${profileText}
 - ゾーン代表語：${zoneRepWord}
 - 感情語（精細）：${word}
 - 感情語：${word}
-- 不安パターン（仮面）：${maskName}
-- アクセル感情：${accelName}
+- 不安パターン（仮面）：${maskName}（裏にある感情：${maskEmotion}）
+- アクセル感情：${accelName}（裏にある感情：${accelEmotion}）
 - エネルギー（E）：${ST.E} ／ フィーリング（F）：${ST.F}
 
+## タネ明かし情報
+- Q1の場面：「${taneScene}」
+- 利用者が選んだ行動：「${taneChoice}」
+- その行動の裏にある感情：${maskEmotion}
+
 ## 出力形式
-以下の5ブロックを、必ずJSON形式で出力してください。
-キーは block1〜block5、値は文字列です。改行は\\nで表現してください。
-JSONのみ出力し、前後に説明や\`\`\`は不要です。
+以下の6ブロックを、必ずJSON形式で出力してください。
+キーは block0〜block5、値は文字列です。改行は\\nで表現してください。
+JSONのみ出力し、前後に説明やコードブロック記号は不要です。
 
 ## 各ブロックの要件
+
+**block0（タネ明かし）**
+「さっき、『${taneScene}』という場面で、あなたは『${taneChoice}』を選びましたね。」から始める。
+次に「実はその選択——${maskEmotion}が、そうさせていたんです。」と続ける。
+最後に「感情は、私たちの行動の『見えない運転手』。あなたが気づいていなかっただけで、ずっとそこにいたんです。」で締める。
+文章はそのまま使ってよいが、自然な流れになるよう微調整してよい。3〜4文。
 
 **block1（受け止めの言葉）**
 利用者の感情状態ゾーン・立場から「いまの状態を受け止める」メッセージ。
@@ -968,6 +1017,7 @@ ${accelName}という願いと${maskName}の不安のジレンマを言語化す
   }
 
   /* フォールバック（API失敗時は既存テンプレートで表示） */
+  const b0=aiBlocks?.block0||(`さっき、「${taneScene}」という場面で、あなたは「${taneChoice}」を選びましたね。\n\n実はその選択——${maskEmotion}が、そうさせていたんです。\n\n感情は、私たちの行動の『見えない運転手』。あなたが気づいていなかっただけで、ずっとそこにいたんです。`);
   const b1=aiBlocks?.block1||ref1;
   const b2=aiBlocks?.block2||("いまの感情は『"+word+"』かな。\n\n"+ref2);
   const b3=aiBlocks?.block3||ref3;
@@ -975,18 +1025,19 @@ ${accelName}という願いと${maskName}の不安のジレンマを言語化す
   const b5=aiBlocks?.block5||ref5;
 
   const blocks=[
-    {label:"① 受け止めの言葉", cls:"receive", head:null, body:b1},
+    {label:"いまのあなたへ、そのままで", cls:"receive", head:null, body:b1},
+    {label:"✦ 気づきのタネ明かし", cls:"tane", head:null, body:b0},
     {label:"② いま、こんな状態かも", cls:"", head:"② いま、こんな状態かも", body:b2},
-    {label:"③ もしかして…こうかも？", cls:"", head:"③ もしかして…こうかも？", body:b3},
     {label:"④ こんなこと、考えてない？", cls:"", head:"④ こんなこと、考えてない？", body:b4},
     {label:"⑤ いまのあなたに送る言葉", cls:"letter", head:null, body:b5}
   ];
 
   const revealLabels=[
+    "▼ 気づきのタネ明かしへ",
     "▼ いまの状態を、もう少し見てみる",
     "▼ もう一段、心の奥へ",
-    "▼ さらに、奥へ",
-    "▼ 最後に、あなたへ"
+    "▼ 最後に、あなたへ",
+    "▼ あなたへのメッセージ"
   ];
 
   const wrap=document.getElementById('out-blocks');

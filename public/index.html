@@ -774,16 +774,16 @@ function qNext(){
 /* 覚醒度（E）: 1-3=低, 4-6=中低, 7-9=中高, 10-12=高 */
 /* 快不快（F）: 1-3=不快, 4-6=やや不快, 7-9=やや快, 10-12=快 */
 function arousalBand(E){
-  if(E>=10)return 4; // 高覚醒
-  if(E>=7) return 3; // 中高覚醒
-  if(E>=4) return 2; // 中低覚醒
-  return 1;          // 低覚醒
+  if(E>=6)return 4; // 高覚醒
+  if(E>=5)return 3; // 中高覚醒
+  if(E>=3)return 2; // 中低覚醒
+  return 1;         // 低覚醒
 }
 function valenceBand(F){
-  if(F>=10)return 4; // 快
-  if(F>=7) return 3; // やや快
-  if(F>=4) return 2; // やや不快
-  return 1;          // 不快
+  if(F>=6)return 4; // 快
+  if(F>=5)return 3; // やや快
+  if(F>=3)return 2; // やや不快
+  return 1;         // 不快
 }
 
 /* 16ゾーンラベル */
@@ -825,7 +825,12 @@ const EMOTION_MAP=[
 
 function emotionWord(zone,F){ return ZONE_WORD[zone]||""; }
 /* 12×12マップから直接引く感情語 */
-function emotionWordExact(E,F){ return EMOTION_MAP[E-1][F-1]||""; }
+function emotionWordExact(E,F){
+  // 1〜6を1〜12にスケール
+  const e=Math.round((E-1)*11/5)+1;
+  const f=Math.round((F-1)*11/5)+1;
+  return EMOTION_MAP[e-1][f-1]||"";
+}
 function buildMood(){
   const mk=(boxId,key)=>{
     const el=document.getElementById(boxId); el.innerHTML='';
@@ -885,7 +890,6 @@ function tally(kind){
 /* ---- 結果生成（AI） ---- */
 async function finish(){
   if(LOCK)return;
-  if(ST.E==null||ST.F==null)return;
   lockOn();
 
   const zone=zoneOf(ST.E,ST.F);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>いま・ここ・私の感情と向き合う — Japan EQ 簡易診断</title>
+<title>感情スイッチ診断 — Japan EQ</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
 
@@ -380,19 +380,13 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
     </svg>
     <p class="eyebrow">Japan EQ ── 簡易診断</p>
     <div class="spacer"></div>
-    <h1>いま・ここ・私の<br>感情と向き合う。</h1>
+    <h1>感情スイッチ診断</h1>
     <div class="spacer"></div>
-    <p class="lead">タイプを知るのではなく、<br>いまの自分の状態に気づく診断です。</p>
+    <p class="lead">あなたの行動にスイッチを入れている<br>"スイッチ感情"を見つける</p>
     <div class="concept">
-      この診断は、あなたを分類しません。<br><br>
-      私たちは毎日、見えない何かに動かされながら行動しています。でも、それが何かに気づいていることは、ほとんどありません。<br><br>
-      6つの場面で行動を選ぶだけで、あなたが普段意識していないものが、静かに浮かび上がってきます。
-    </div>
-    <div class="meta">
-      <span class="chip">所要 約3分</span>
-      <span class="chip">スマホで完結</span>
-      <span class="chip">データは端末内のみ</span>
-      <span class="chip">全6問＋状態測定</span>
+      私たちは毎日、何かに動かされて行動しています。<br><br>
+      でも、その「何か」に気づいていることは、ほとんどありません。<br><br>
+      6つの場面で行動を選ぶだけで、あなたの行動のスイッチを入れている感情が、静かに浮かび上がってきます。
     </div>
     <button class="btn" onclick="start()">はじめる</button>
     <div class="spacer-l"></div>
@@ -461,11 +455,11 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
       <circle cx="16" cy="82" r="1.5" fill="#2E9E7A" opacity=".09"/>
     </svg>
     <div class="spacer-l"></div>
-    <p class="eyebrow">Japan EQ ── STEP 3 / いまの状態</p>
+    <p class="eyebrow">Japan EQ ── STEP 2 / いまの状態</p>
     <div class="spacer"></div>
     <h2>いまの自分を、<br>数字で教えてください。</h2>
     <p class="lead" style="margin-top:10px">
-      いま現在のこころの活力と快適度の状態を、1から12の数字で教えてください。<br>
+      いま現在のこころの活力と快適度の状態を、1から6の数字で教えてください。<br>
       2つの数値から、いまの「感情ゾーン」と「感情語」を導き出します。
     </p>
     <div class="spacer-l"></div>
@@ -475,7 +469,7 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
         <span class="num-label">エネルギー</span>
         <span class="num-sub">こころの活力</span>
       </div>
-      <div class="num-scale"><span>1 ・ 力が出ない</span><span>最高の状態 ・ 12</span></div>
+      <div class="num-scale"><span>1 ・ 力が出ない</span><span>最高の状態 ・ 6</span></div>
       <div class="num-grid" id="grid-e"></div>
     </div>
 
@@ -484,15 +478,14 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
         <span class="num-label">フィーリング</span>
         <span class="num-sub">こころの快適度</span>
       </div>
-      <div class="num-scale"><span>1 ・ 不快</span><span>最高の状態 ・ 12</span></div>
+      <div class="num-scale"><span>1 ・ 不快</span><span>最高の状態 ・ 6</span></div>
       <div class="num-grid" id="grid-f"></div>
     </div>
 
     <div class="readout">
       <div class="zone-name" id="mood-zone">──</div>
-      <div class="ef" id="mood-ef">エネルギーとフィーリングを選んでください</div>
     </div>
-    <button class="btn" id="mood-next" onclick="finish()" style="opacity:.4">結果をみる</button>
+    <button class="btn" id="mood-next" onclick="moodNext()" style="opacity:.4">次へ</button>
     <div class="spacer-l"></div>
   </section>
 
@@ -502,7 +495,7 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
       <div class="loading-dots">
         <span></span><span></span><span></span>
       </div>
-      <p class="loading-msg">あなただけの言葉を<br>生成しています…</p>
+      <p class="loading-msg">あなたへのメッセージを<br>綴っています…</p>
       <p class="loading-sub">少々お待ちください</p>
     </div>
   </section>
@@ -728,15 +721,15 @@ function attrNext(){
   if(LOCK)return;
   if(!(ST.age&&ST.role&&ST.gender))return;
   lockOn();
-  ST.qi=0; ST.answers=[];
-  renderQ(); show('s-q');
+  ST.E=null; ST.F=null;
+  show('s-mood'); setProgress(2,9,'STEP 2 / いまの状態'); buildMood();
   setTimeout(lockOff,300);
 }
 
 /* ---- 設問 ---- */
 function renderQ(){
   const q=QUESTIONS[ST.qi];
-  setProgress(2+ST.qi,9,'STEP 2 / 設問 '+(ST.qi+1)+' of 6');
+  setProgress(3+ST.qi,9,'STEP 3 / 設問 '+(ST.qi+1)+' of 6');
   document.getElementById('q-tag').textContent='Q'+(ST.qi+1)+'  ──  '+q.tag;
   document.getElementById('q-scene').textContent=q.scene;
   document.getElementById('q-ask').textContent=q.ask;
@@ -760,12 +753,20 @@ function renderQ(){
   });
   window.scrollTo(0,0);
 }
+function moodNext(){
+  if(LOCK)return;
+  if(ST.E==null||ST.F==null)return;
+  lockOn();
+  ST.qi=0; ST.answers=[];
+  renderQ(); show('s-q');
+  setTimeout(lockOff,300);
+}
 function qNext(){
   if(LOCK)return;
   if(!ST.answers[ST.qi])return;
   lockOn();
   if(ST.qi<QUESTIONS.length-1){ ST.qi++; renderQ(); window.scrollTo(0,0); }
-  else { show('s-mood'); setProgress(8,9,'STEP 3 / いまの状態'); buildMood(); }
+  else { finish(); }
   setTimeout(lockOff,300);
 }
 
@@ -828,7 +829,7 @@ function emotionWordExact(E,F){ return EMOTION_MAP[E-1][F-1]||""; }
 function buildMood(){
   const mk=(boxId,key)=>{
     const el=document.getElementById(boxId); el.innerHTML='';
-    for(let n=1;n<=12;n++){
+    for(let n=1;n<=6;n++){
       const b=document.createElement('button');
       b.className='num'; b.textContent=n;
       /* エネルギー: 1=白→12=濃、フィーリング: 1=濃→12=白 */
@@ -858,7 +859,6 @@ function updateMood(){
   const btn=document.getElementById('mood-next');
   if(ST.E==null||ST.F==null){
     document.getElementById('mood-zone').textContent='──';
-    document.getElementById('mood-ef').textContent='エネルギーとフィーリングを選んでください';
     btn.style.opacity='.4';
     return;
   }
@@ -867,7 +867,6 @@ function updateMood(){
   const rep=ZONE_WORD[z];
   const wordDisplay = exact===rep ? exact : rep+'・'+exact;
   document.getElementById('mood-zone').textContent=wordDisplay+'（'+zoneName(ST.E,ST.F)+'）';
-  document.getElementById('mood-ef').textContent='エネルギー '+ST.E+' ・ フィーリング '+ST.F;
   btn.style.opacity='1';
 }
 
@@ -953,19 +952,13 @@ ${profileText}
 - その行動の裏にある感情：${maskEmotion}
 
 ## 出力形式
-以下の6ブロックを、必ずJSON形式で出力してください。
-キーは block0〜block5、値は文字列です。改行は\\nで表現してください。
+以下の4ブロックを、必ずJSON形式で出力してください。
+キーは block1, block2, block4, letter、値は文字列です。改行は\\nで表現してください。
 JSONのみ出力し、前後に説明やコードブロック記号は不要です。
 
 ## 各ブロックの要件
 
-**block0（タネ明かし）**
-「さっき、『${taneScene}』という場面で、あなたは『${taneChoice}』を選びましたね。」から始める。
-次に「もしかしたら、その選択——${maskEmotion}が、そうさせていたのかもしれません。」と続ける。
-最後に「感情は、私たちの行動の『見えない運転手』。気づいていなかっただけで、ずっとそこにいるんです。」で締める。
-断定せず「〜かも」「〜かもしれません」のトーンで書くこと。3〜4文。
-
-**block1（受け止めの言葉）**
+**block1（いまのあなたへ、そのままで）**
 利用者の感情状態ゾーン・立場から「いまの状態を受け止める」メッセージ。
 2〜3文。温かく、断定せず、寄り添う語調。「〜なんですね」「〜かもしれませんね」で締める。
 参考トーン：「${ref1}」
@@ -975,20 +968,27 @@ JSONのみ出力し、前後に説明やコードブロック記号は不要で�
 続けてエネルギーとフィーリングの状態を温かく映し出す。ゾーン代表語「${zoneRepWord}」も意識したトーンで。3〜5文。
 参考トーン：「${ref2}」
 
-**block3（もしかして…こうかも？）**
-${maskName}への気づきを促す。「もしかして〜」から始める。
-断定せず、心当たりを問いかける語調。3〜4文。
-テンプレートの言葉をそのまま使わず、この人の具体的な状況（${zoneLabel}・E${ST.E}/F${ST.F}）に合わせた独自の言葉で書くこと。
-
 **block4（こんなこと、考えてない？）**
 ${accelName}という願いと${maskName}の不安のジレンマを言語化する。
 「〜という気持ちと〜という気持ちが、心の中に両方あったりしませんか？」の構造を使う。4〜5文。
 この人の立場（${ST.role}・${ST.age}）に合った具体的なシーンを想像して書くこと。テンプレートの言い回しをそのまま使わない。
 
-**block5（いまのあなたに送る言葉）**
-「今日のあなたへ。」から始まる手紙風メッセージ。
-受け止め・労い・承認で包み込む。行動提案は含めない。4〜6行、改行多め。
-この人だけに向けた言葉を書くこと。一般的な励ましではなく、${word}という感情を抱えているこの人への、固有のメッセージにする。
+**letter（あなたへのメッセージ）**
+【構成】3つのパートで書く。
+
+パート1「私から見たあなたは」：
+「私から見たあなたは、」から始める。
+Q1の場面「${taneScene}」でのあなたの行動「${taneChoice}」に触れながら、その行動の裏に${maskEmotion}があったかもしれないことを、温かく、断定せず伝える。
+「〜だったのかもしれませんね」のトーン。2〜3文。
+
+パート2（受け止め・労い）：
+その感情を抱えながら日々を過ごしていることへの共感と承認。
+「今日のあなたへ。」は使わない。3〜4文、改行多め。
+
+パート3（今日の行動アドバイス）：
+「今日、ひとつだけ。」から始める。
+${maskEmotion}を抱えるこの人が、今日すぐできる具体的で小さな行動を1つだけ提案する。
+抽象的にならず、誰でもすぐできる行動にする。2〜3文。
 
 ## 文体の注意
 - です・ます調は使わない。「〜ですね」「〜かもしれません」程度はOK
@@ -1017,27 +1017,23 @@ ${accelName}という願いと${maskName}の不安のジレンマを言語化す
   }
 
   /* フォールバック（API失敗時は既存テンプレートで表示） */
-  const b0=aiBlocks?.block0||(`さっき、「${taneScene}」という場面で、あなたは「${taneChoice}」を選びましたね。\n\nもしかしたら、その選択——${maskEmotion}が、そうさせていたのかもしれません。\n\n感情は、私たちの行動の『見えない運転手』。気づいていなかっただけで、ずっとそこにいるんです。`);
   const b1=aiBlocks?.block1||ref1;
   const b2=aiBlocks?.block2||("いまの感情は『"+word+"』かな。\n\n"+ref2);
-  const b3=aiBlocks?.block3||ref3;
   const b4=aiBlocks?.block4||ref4;
-  const b5=aiBlocks?.block5||ref5;
+  const bletter=aiBlocks?.letter||(`私から見たあなたは、「${taneScene}」という場面で「${taneChoice}」を選んでいましたね。もしかしたら、${maskEmotion}が、そうさせていたのかもしれません。\n\nそんな気持ちを抱えながら、日々を過ごしているあなたへ。\nそれだけで、十分すぎるくらい、頑張っています。\n\n今日、ひとつだけ。\n今夜、自分にやさしい言葉をひとつかけてみてください。`);
 
   const blocks=[
     {label:"いまのあなたへ、そのままで", cls:"receive", head:null, body:b1},
-    {label:"✦ 気づきのタネ明かし", cls:"tane", head:null, body:b0},
     {label:"② いま、こんな状態かも", cls:"", head:"② いま、こんな状態かも", body:b2},
     {label:"④ こんなこと、考えてない？", cls:"", head:"④ こんなこと、考えてない？", body:b4},
-    {label:"⑤ いまのあなたに送る言葉", cls:"letter", head:null, body:b5}
+    {label:"あなたへのメッセージ", cls:"letter", head:null, body:bletter}
   ];
 
   const revealLabels=[
-    "▼ 気づきのタネ明かしへ",
     "▼ いまの状態を、もう少し見てみる",
     "▼ もう一段、心の奥へ",
-    "▼ 最後に、あなたへ",
-    "▼ あなたへのメッセージ"
+    "▼ あなたへのメッセージへ",
+    "▼ 最後に、あなたへ"
   ];
 
   const wrap=document.getElementById('out-blocks');

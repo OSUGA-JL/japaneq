@@ -762,28 +762,32 @@ function moodNext(){
   setTimeout(lockOff,300);
 }
 function qNext(){
+  console.log("qNext called, LOCK=",LOCK,"qi=",ST.qi,"answer=",ST.answers[ST.qi]);
   if(LOCK)return;
   if(!ST.answers[ST.qi])return;
   lockOn();
-  if(ST.qi<QUESTIONS.length-1){ ST.qi++; renderQ(); window.scrollTo(0,0); }
-  else { finish(); }
-  setTimeout(lockOff,300);
+  console.log("qNext proceeding, length=",QUESTIONS.length);
+  if(ST.qi<QUESTIONS.length-1){ ST.qi++; renderQ(); window.scrollTo(0,0); setTimeout(lockOff,300); }
+  else { lockOff(); console.log("calling finish"); finish(); }
 }
 
 /* ---- ムードメーター判定 ---- */
 /* 覚醒度（E）: 1-3=低, 4-6=中低, 7-9=中高, 10-12=高 */
 /* 快不快（F）: 1-3=不快, 4-6=やや不快, 7-9=やや快, 10-12=快 */
 function arousalBand(E){
-  if(E>=6)return 4; // 高覚醒
-  if(E>=5)return 3; // 中高覚醒
-  if(E>=3)return 2; // 中低覚醒
-  return 1;         // 低覚醒
+  // 1〜6を12段階に変換（1→1-2, 2→3-4, 3→5-6, 4→7-8, 5→9-10, 6→11-12）
+  const e12=(E-1)*2+1; // 1→1, 2→3, 3→5, 4→7, 5→9, 6→11
+  if(e12>=10)return 4; // 高覚醒
+  if(e12>=7) return 3; // 中高覚醒
+  if(e12>=4) return 2; // 中低覚醒
+  return 1;            // 低覚醒
 }
 function valenceBand(F){
-  if(F>=6)return 4; // 快
-  if(F>=5)return 3; // やや快
-  if(F>=3)return 2; // やや不快
-  return 1;         // 不快
+  const f12=(F-1)*2+1;
+  if(f12>=10)return 4; // 快
+  if(f12>=7) return 3; // やや快
+  if(f12>=4) return 2; // やや不快
+  return 1;            // 不快
 }
 
 /* 16ゾーンラベル */
@@ -826,9 +830,9 @@ const EMOTION_MAP=[
 function emotionWord(zone,F){ return ZONE_WORD[zone]||""; }
 /* 12×12マップから直接引く感情語 */
 function emotionWordExact(E,F){
-  // 1〜6を1〜12にスケール
-  const e=Math.round((E-1)*11/5)+1;
-  const f=Math.round((F-1)*11/5)+1;
+  // 1〜6を12段階に変換（1→1, 2→3, 3→5, 4→7, 5→9, 6→11）
+  const e=(E-1)*2+1;
+  const f=(F-1)*2+1;
   return EMOTION_MAP[e-1][f-1]||"";
 }
 function buildMood(){
@@ -837,8 +841,8 @@ function buildMood(){
     for(let n=1;n<=6;n++){
       const b=document.createElement('button');
       b.className='num'; b.textContent=n;
-      /* エネルギー: 1=白→12=濃、フィーリング: 1=濃→12=白 */
-      const t = key==='E' ? (n-1)/11 : (12-n)/11;
+      /* 両方とも1=白、6=最濃色 */
+      const t = (n-1)/5;
       const r=Math.round(255+(46-255)*t);
       const g=Math.round(255+(158-255)*t);
       const bv=Math.round(255+(122-255)*t);
@@ -870,8 +874,9 @@ function updateMood(){
   const z=zoneOf(ST.E,ST.F);
   const exact=emotionWordExact(ST.E,ST.F);
   const rep=ZONE_WORD[z];
-  const wordDisplay = exact===rep ? exact : rep+'・'+exact;
-  document.getElementById('mood-zone').textContent=wordDisplay+'（'+zoneName(ST.E,ST.F)+'）';
+  const zoneWord = rep;
+  const emotionWord = exact;
+  document.getElementById('mood-zone').textContent='いまの感情ゾーン：'+zoneWord+'　／　感情語：'+emotionWord;
   btn.style.opacity='1';
 }
 
@@ -899,6 +904,7 @@ async function finish(){
   const grp=roleGroup(ST.role);
 
   /* ローディング表示 */
+  console.log("finish: showing loading screen");
   show('s-loading');
   setProgress(9,9,'結果を生成中…');
 
@@ -991,8 +997,22 @@ Q1の場面「${taneScene}」でのあなたの行動「${taneChoice}」に触�
 
 パート3（今日の行動アドバイス）：
 「今日、ひとつだけ。」から始める。
-${maskEmotion}を抱えるこの人が、今日すぐできる具体的で小さな行動を1つだけ提案する。
-抽象的にならず、誰でもすぐできる行動にする。2〜3文。
+立場によってトーンと内容を変えること：
+
+【会社員・管理職の場合】
+- 切れ味のある分析的な視点で。エモーショナルすぎず、行動変容につながる示唆を出す
+- 「その感情に気づいているだけで、次の行動が変わる」という方向性
+- 具体的なアドバイス例：「今日の会議で、自分が何に反応したかをメモしてみてください」「チームの誰かに、今日ひとつだけ感謝を言葉にしてみてください」のように、職場で今日すぐできる行動
+
+【パート・アルバイト・その他の場合】
+- バランスよく。受け止めつつ、小さな一歩を提案
+- 具体的なアドバイス例：「今日帰り道に、自分が何を感じたかを3つ思い出してみてください」のような、日常の中ですぐできる行動
+
+【主婦・主夫・学生の場合】
+- 温かく受け止め中心。自己肯定感を上げる方向
+- 具体的なアドバイス例：「今日、自分が頑張ったことをひとつ声に出してみてください」のような、自分を認める行動
+
+いずれも抽象的にならず、今日その人がすぐできる具体的な行動を1つだけ提案する。2〜3文。
 
 ## 文体の注意
 - です・ます調は使わない。「〜ですね」「〜かもしれません」程度はOK
@@ -1008,16 +1028,19 @@ ${maskEmotion}を抱えるこの人が、今日すぐできる具体的で小さ
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         model:"claude-sonnet-4-5",
-        max_tokens:2000,
+        max_tokens:1000,
         messages:[{role:"user",content:prompt}]
       })
     });
     const data=await res.json();
+    if(!res.ok){ throw new Error("Server error: "+res.status); }
+    if(!data.content){ throw new Error("No content in response"); }
     const text=data.content.map(c=>c.text||"").join("");
     const clean=text.replace(/```json|```/g,"").trim();
     aiBlocks=JSON.parse(clean);
   } catch(e){
     console.error("AI生成エラー、フォールバックを使用:",e);
+    console.log("Error details:", e.message, e.stack);
   }
 
   /* フォールバック（API失敗時は既存テンプレートで表示） */
@@ -1028,8 +1051,8 @@ ${maskEmotion}を抱えるこの人が、今日すぐできる具体的で小さ
 
   const blocks=[
     {label:"いまのあなたへ、そのままで", cls:"receive", head:null, body:b1},
-    {label:"② いま、こんな状態かも", cls:"", head:"② いま、こんな状態かも", body:b2},
-    {label:"④ こんなこと、考えてない？", cls:"", head:"④ こんなこと、考えてない？", body:b4},
+    {label:"いま、こんな状態かも", cls:"", head:"いま、こんな状態かも", body:b2},
+    {label:"こんなこと、考えてない？", cls:"", head:"こんなこと、考えてない？", body:b4},
     {label:"あなたへのメッセージ", cls:"letter", head:null, body:bletter}
   ];
 
@@ -1124,6 +1147,7 @@ ${maskEmotion}を抱えるこの人が、今日すぐできる具体的で小さ
   again.onclick=()=>{ if(LOCK)return; lockOn(); again.disabled=true; location.reload(); };
   wrap.appendChild(again);
 
+  console.log("finish: showing result screen");
   show('s-out');
   setProgress(9,9,'結果');
   setTimeout(()=>{

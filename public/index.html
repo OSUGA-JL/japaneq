@@ -522,7 +522,7 @@ h2{font-size:18px;font-weight:700;line-height:1.55;}
     <div class="foot">
       この診断は、あなたを分類しません。<br>
       いまのあなたの状態を、いまのものとして受け止めました。<br><br>
-      Japan EQ 簡易診断 ── いま・ここ・私の状態
+      感情スイッチ診断
     </div>
     <div class="spacer-l"></div>
   </section>
@@ -1125,20 +1125,7 @@ Q1の場面「${taneScene}」でのあなたの行動「${taneChoice}」に触�
   ctaLink.target='_blank';
   ctaLink.rel='noopener';
 
-  /* 開発者用 */
-  const dev=document.createElement('details');
-  dev.className='devbox';
-  dev.innerHTML='<summary>▸ 診断ロジックの内訳（開発者用）</summary>'
-    +'<div class="devgrid">'
-    +'<div><span>属性</span><b>'+ST.age+' / '+ST.role+' / '+ST.gender+'</b></div>'
-    +'<div><span>ムードメーター</span><b>E'+ST.E+' × F'+ST.F+'</b></div>'
-    +'<div><span>感情状態ゾーン</span><b>'+zoneName(ST.E,ST.F)+'</b></div>'
-    +'<div><span>感情語</span><b>'+word+'</b></div>'
-    +'<div><span>不安パターン（仮面）</span><b>'+MASK[maskK].name+'</b></div>'
-    +'<div><span>アクセル感情</span><b>'+ACCEL[accelK].name+'</b></div>'
-    +'<div><span>生成方式</span><b>'+(aiBlocks?'AI生成':'フォールバック')+'</b></div>'
-    +'</div>';
-  wrap.appendChild(dev);
+
 
   /* 再診断 */
   const again=document.createElement('button');
